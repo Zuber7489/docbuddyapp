@@ -352,7 +352,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         Text(
           doctor.name,
           style: const TextStyle(
-            fontSize: 18,
+            fontSize: 14,
             fontWeight: FontWeight.w700,
             color: Colors.black87,
           ),
@@ -467,8 +467,11 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         Expanded(
           child: ElevatedButton.icon(
             onPressed: () => _makePhoneCall(doctor.phone),
-            icon: const Icon(Icons.phone, size: 18),
-            label: const Text('Call'),
+            icon: const Icon(Icons.phone, size: 16),
+            label: const Text(
+              'Call',
+              style: TextStyle(fontSize: 12),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF10B981),
               foregroundColor: Colors.white,
@@ -483,8 +486,11 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         Expanded(
           child: ElevatedButton.icon(
             onPressed: () => _openWhatsApp(doctor.whatsapp, doctor.name),
-            icon: const Icon(Icons.chat, size: 18),
-            label: const Text('WhatsApp'),
+            icon: const Icon(Icons.chat, size: 16),
+            label: const Text(
+              'WhatsApp',
+              style: TextStyle(fontSize: 12),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF25D366),
               foregroundColor: Colors.white,
@@ -506,8 +512,11 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                 ),
               );
             },
-            icon: const Icon(Icons.calendar_today, size: 18),
-            label: const Text('Book'),
+            icon: const Icon(Icons.calendar_today, size: 16),
+            label: const Text(
+              'Book',
+              style: TextStyle(fontSize: 12),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF6366F1),
               foregroundColor: Colors.white,
@@ -523,31 +532,115 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   }
 
   Future<void> _makePhoneCall(String phoneNumber) async {
-    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
     try {
-      if (await canLaunchUrl(phoneUri)) {
-        await launchUrl(phoneUri);
-      } else {
-        _showErrorSnackBar('Could not launch phone dialer');
+      // Clean the phone number - remove spaces, dashes, and other characters
+      final cleanPhone = phoneNumber.replaceAll(RegExp(r'[^0-9+]'), '');
+      
+      // Debug: Show the cleaned phone number
+      print('Original phone: $phoneNumber, Cleaned: $cleanPhone');
+      
+      // Try multiple phone URI formats
+      final phoneUris = [
+        Uri(scheme: 'tel', path: cleanPhone),
+        Uri.parse('tel:$cleanPhone'),
+        Uri.parse('tel://$cleanPhone'),
+      ];
+      
+      bool launched = false;
+      
+      for (final uri in phoneUris) {
+        try {
+          print('Trying URI: $uri');
+          if (await canLaunchUrl(uri)) {
+            print('Can launch: $uri');
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+            launched = true;
+            _showSuccessSnackBar('Opening phone dialer...');
+            break;
+          } else {
+            print('Cannot launch: $uri');
+          }
+        } catch (e) {
+          print('Error with URI $uri: $e');
+          // Continue to next URI format
+          continue;
+        }
+      }
+      
+      if (!launched) {
+        // Try to open dialer without pre-filled number
+        final dialerUri = Uri(scheme: 'tel');
+        print('Trying fallback dialer: $dialerUri');
+        if (await canLaunchUrl(dialerUri)) {
+          await launchUrl(dialerUri, mode: LaunchMode.externalApplication);
+          _showSuccessSnackBar('Opening phone dialer...');
+        } else {
+          _showErrorSnackBar('Phone dialer not available on this device');
+        }
       }
     } catch (e) {
+      print('Phone call error: $e');
       _showErrorSnackBar('Error making phone call: $e');
     }
   }
 
-  Future<void> _openWhatsApp(String phoneNumber, String doctorName) async {
-    // Remove any spaces and special characters from phone number
-    final cleanPhone = phoneNumber.replaceAll(RegExp(r'[^0-9+]'), '');
-    final message = "Hello Dr. $doctorName, I would like to book an appointment with you.";
-    final whatsappUrl = "https://wa.me/$cleanPhone?text=${Uri.encodeComponent(message)}";
-    
+    Future<void> _openWhatsApp(String phoneNumber, String doctorName) async {
     try {
-      if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
-        await launchUrl(Uri.parse(whatsappUrl), mode: LaunchMode.externalApplication);
-      } else {
-        _showErrorSnackBar('WhatsApp is not installed on this device');
+      // Clean the phone number - remove spaces, dashes, and other characters
+      final cleanPhone = phoneNumber.replaceAll(RegExp(r'[^0-9+]'), '');
+      
+      // Remove + if it's the first character for WhatsApp
+      final whatsappPhone = cleanPhone.startsWith('+') ? cleanPhone.substring(1) : cleanPhone;
+      
+      // Debug: Show the cleaned phone number
+      print('Original WhatsApp phone: $phoneNumber, Cleaned: $cleanPhone, WhatsApp: $whatsappPhone');
+      
+      final message = "Hello Dr. $doctorName, I would like to book an appointment with you.";
+      
+      // Try multiple WhatsApp URL formats
+      final whatsappUrls = [
+        "https://wa.me/$whatsappPhone?text=${Uri.encodeComponent(message)}",
+        "whatsapp://send?phone=$whatsappPhone&text=${Uri.encodeComponent(message)}",
+        "https://api.whatsapp.com/send?phone=$whatsappPhone&text=${Uri.encodeComponent(message)}",
+      ];
+      
+      bool launched = false;
+      
+      for (final url in whatsappUrls) {
+        try {
+          final uri = Uri.parse(url);
+          print('Trying WhatsApp URL: $url');
+          if (await canLaunchUrl(uri)) {
+            print('Can launch WhatsApp: $url');
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+            launched = true;
+            _showSuccessSnackBar('Opening WhatsApp...');
+            break;
+          } else {
+            print('Cannot launch WhatsApp: $url');
+          }
+        } catch (e) {
+          print('Error with WhatsApp URL $url: $e');
+          // Continue to next URL format
+          continue;
+        }
+      }
+      
+      if (!launched) {
+        // If WhatsApp is not available, try to open in browser
+        final webUrl = "https://web.whatsapp.com/send?phone=$whatsappPhone&text=${Uri.encodeComponent(message)}";
+        final webUri = Uri.parse(webUrl);
+        
+        print('Trying WhatsApp Web: $webUrl');
+        if (await canLaunchUrl(webUri)) {
+          await launchUrl(webUri, mode: LaunchMode.externalApplication);
+          _showSuccessSnackBar('Opening WhatsApp Web...');
+        } else {
+          _showErrorSnackBar('WhatsApp is not available on this device');
+        }
       }
     } catch (e) {
+      print('WhatsApp error: $e');
       _showErrorSnackBar('Error opening WhatsApp: $e');
     }
   }
@@ -558,6 +651,18 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         content: Text(message),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
       ),
     );
   }
