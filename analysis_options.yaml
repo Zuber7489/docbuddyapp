@@ -1,0 +1,115 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Prefer const constructors
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    
+    # Prefer const declarations
+    prefer_const_declarations: true
+    
+    # Avoid unnecessary containers
+    avoid_unnecessary_containers: true
+    
+    # Prefer sized box over container
+    sized_box_for_whitespace: true
+    
+    # Prefer const constructors in const contexts
+    prefer_const_constructors_in_immutables: true
+    
+    # Avoid print statements
+    avoid_print: true
+    
+    # Prefer single quotes
+    prefer_single_quotes: true
+    
+    # Sort pub dependencies
+    sort_pub_dependencies: true
+    
+    # Use key in widget constructors
+    use_key_in_widget_constructors: true
+    
+    # Avoid unnecessary nullable parameters
+    avoid_unnecessary_nullable_parameters: true
+    
+    # Prefer final fields
+    prefer_final_fields: true
+    
+    # Prefer final locals
+    prefer_final_locals: true
+    
+    # Prefer final parameters
+    prefer_final_parameters: true
+    
+    # Avoid empty else
+    avoid_empty_else: true
+    
+    # Avoid relative imports
+    avoid_relative_lib_imports: true
+    
+    # Prefer relative imports
+    prefer_relative_imports: true
+    
+    # Avoid unnecessary getters
+    avoid_unnecessary_getters: true
+    
+    # Prefer initializing formal parameters
+    prefer_initializing_formals: true
+    
+    # Prefer is empty
+    prefer_is_empty: true
+    
+    # Prefer is not empty
+    prefer_is_not_empty: true
+    
+    # Prefer iterable where type
+    prefer_iterable_where_type: true
+    
+    # Prefer match file name
+    prefer_match_file_name: true
+    
+    # Prefer null aware operators
+    prefer_null_aware_operators: true
+    
+    # Prefer spread collections
+    prefer_spread_collections: true
+    
+    # Prefer void to null
+    prefer_void_to_null: true
+    
+    # Use full hex values
+    use_full_hex_values_for_flutter_colors: true
+    
+    # Use rethrow
+    use_rethrow_when_possible: true
+    
+    # Use set literals
+    use_set_literals: true
+    
+    # Use string buffers
+    use_string_buffers: true
+    
+    # Use test throws
+    use_test_throws_matchers: true
+    
+    # Use throwing
+    use_throwing: true
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  errors:
+    # Treat missing required parameters as a warning (not a hint)
+    missing_required_param: warning
+    # Treat missing returns as a warning (not a hint)
+    missing_return: warning
+    # Allow having TODOs in the code
+    todo: ignore
+    # Allow having unused code
+    unused_code: warning
+    # Allow having unused imports
+    unused_import: warning
+    # Allow having unused local variables
+    unused_local_variable: warning 
