@@ -1,10 +1,15 @@
- import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import '../models/user.dart';
 import '../models/doctor.dart';
 
 class AuthService extends ChangeNotifier {
   User? _currentUser;
   bool _isLoading = false;
+  static const String _userDataKey = 'user_data';
+  static const String _patientPasswordsKey = 'patient_passwords';
+  static const String _currentUserKey = 'current_user';
 
   User? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
@@ -63,7 +68,7 @@ class AuthService extends ChangeNotifier {
     'phone': '+1-555-0000',
   };
 
-  // Mock user database
+  // Mock user database - will be loaded from SharedPreferences
   static final Map<String, User> _users = {
     // Super admin
     'admin': User(
@@ -117,8 +122,97 @@ class AuthService extends ChangeNotifier {
     ),
   };
 
-  // Mock patient accounts
+  // Mock patient accounts - will be loaded from SharedPreferences
   static final Map<String, String> _patientPasswords = {};
+
+  // Initialize the service
+  Future<void> initialize() async {
+    await _loadUserData();
+    await _loadCurrentUser();
+  }
+
+  // Load user data from SharedPreferences
+  Future<void> _loadUserData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userDataString = prefs.getString(_userDataKey);
+      final passwordsString = prefs.getString(_patientPasswordsKey);
+      
+      if (userDataString != null) {
+        final userData = json.decode(userDataString) as Map<String, dynamic>;
+        userData.forEach((key, value) {
+          if (key != 'admin' && !key.startsWith('dr.')) {
+            _users[key] = User.fromJson(value);
+          }
+        });
+      }
+      
+      if (passwordsString != null) {
+        final passwords = json.decode(passwordsString) as Map<String, dynamic>;
+        _patientPasswords.addAll(passwords.cast<String, String>());
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error loading user data: $e');
+      }
+    }
+  }
+
+  // Save user data to SharedPreferences
+  Future<void> _saveUserData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Save only patient users (exclude admin and doctors)
+      final patientUsers = <String, dynamic>{};
+      _users.forEach((key, user) {
+        if (key != 'admin' && !key.startsWith('dr.')) {
+          patientUsers[key] = user.toJson();
+        }
+      });
+      
+      await prefs.setString(_userDataKey, json.encode(patientUsers));
+      await prefs.setString(_patientPasswordsKey, json.encode(_patientPasswords));
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error saving user data: $e');
+      }
+    }
+  }
+
+  // Load current user from SharedPreferences
+  Future<void> _loadCurrentUser() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final currentUserString = prefs.getString(_currentUserKey);
+      
+      if (currentUserString != null) {
+        final userData = json.decode(currentUserString) as Map<String, dynamic>;
+        _currentUser = User.fromJson(userData);
+        notifyListeners();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error loading current user: $e');
+      }
+    }
+  }
+
+  // Save current user to SharedPreferences
+  Future<void> _saveCurrentUser() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (_currentUser != null) {
+        await prefs.setString(_currentUserKey, json.encode(_currentUser!.toJson()));
+      } else {
+        await prefs.remove(_currentUserKey);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error saving current user: $e');
+      }
+    }
+  }
 
   Future<bool> login(String username, String password) async {
     _isLoading = true;
@@ -132,6 +226,7 @@ class AuthService extends ChangeNotifier {
       if (username == superAdminAccount['username'] && 
           password == superAdminAccount['password']) {
         _currentUser = _users['admin'];
+        await _saveCurrentUser();
         _isLoading = false;
         notifyListeners();
         return true;
@@ -142,6 +237,7 @@ class AuthService extends ChangeNotifier {
         if (entry.value['username'] == username && 
             entry.value['password'] == password) {
           _currentUser = _users[username];
+          await _saveCurrentUser();
           _isLoading = false;
           notifyListeners();
           return true;
@@ -152,6 +248,7 @@ class AuthService extends ChangeNotifier {
       if (_users.containsKey(username) && 
           _patientPasswords[username] == password) {
         _currentUser = _users[username];
+        await _saveCurrentUser();
         _isLoading = false;
         notifyListeners();
         return true;
@@ -182,9 +279,9 @@ class AuthService extends ChangeNotifier {
         return false;
       }
 
-      // Create new patient user
+      // Create new patient user with unique username
       final userId = 'patient_${DateTime.now().millisecondsSinceEpoch}';
-      final username = email.split('@')[0];
+      final username = 'user_${DateTime.now().millisecondsSinceEpoch}'; // Unique username
       
       final newUser = User(
         id: userId,
@@ -197,7 +294,12 @@ class AuthService extends ChangeNotifier {
       _users[username] = newUser;
       _patientPasswords[username] = password;
 
+      // Save to persistent storage
+      await _saveUserData();
+
       _currentUser = newUser;
+      await _saveCurrentUser();
+      
       _isLoading = false;
       notifyListeners();
       return true;
@@ -210,6 +312,7 @@ class AuthService extends ChangeNotifier {
 
   void logout() {
     _currentUser = null;
+    _saveCurrentUser(); // Clear saved user
     notifyListeners();
   }
 
@@ -242,5 +345,54 @@ class AuthService extends ChangeNotifier {
       }
     }
     return null;
+  }
+
+  // Find username by email for patient accounts
+  String? findUsernameByEmail(String email) {
+    for (var entry in _users.entries) {
+      if (entry.value.email == email && entry.value.userType == 'patient') {
+        return entry.key;
+      }
+    }
+    return null;
+  }
+
+  // Update user profile
+  Future<bool> updateProfile(String name, String email, String phone) async {
+    try {
+      if (_currentUser != null) {
+        // Create updated user
+        final updatedUser = User(
+          id: _currentUser!.id,
+          name: name,
+          email: email,
+          phone: phone,
+          userType: _currentUser!.userType,
+          doctorId: _currentUser!.doctorId,
+        );
+
+        // Update in users map
+        final username = _users.entries
+            .firstWhere((entry) => entry.value.id == _currentUser!.id)
+            .key;
+        _users[username] = updatedUser;
+
+        // Update current user
+        _currentUser = updatedUser;
+
+        // Save to persistent storage
+        await _saveUserData();
+        await _saveCurrentUser();
+
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error updating profile: $e');
+      }
+      return false;
+    }
   }
 }

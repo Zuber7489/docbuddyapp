@@ -224,53 +224,6 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
       padding: const EdgeInsets.all(24.0),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: const BorderRadius.all(Radius.circular(16)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'My Appointments',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                Text(
-                  'Manage your health schedule',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white.withOpacity(0.9),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -287,7 +240,32 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
             child: const Icon(
               Icons.calendar_today,
               color: Colors.white,
-              size: 24,
+              size: 28,
+            ),
+          ),
+          const SizedBox(width: 16),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'My Appointments',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                Text(
+                  'Manage your health schedule',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -421,7 +399,18 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
                   ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              // Navigate to doctors tab to book appointment
+              // Since this is a tab, we need to use a callback or navigate to main screen
+              // For now, we'll show a message to use the doctors tab
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Use the Doctors tab to book appointments'),
+                  backgroundColor: Color(0xFF6366F1),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
             icon: const Icon(Icons.add),
             label: const Text('Book Appointment'),
             style: ElevatedButton.styleFrom(

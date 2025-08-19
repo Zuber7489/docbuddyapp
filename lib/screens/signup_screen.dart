@@ -1,7 +1,7 @@
  import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
-import 'home_screen.dart';
+import 'main_navigation_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -55,7 +55,7 @@ class _SignupScreenState extends State<SignupScreen> {
     if (success && mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
       );
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

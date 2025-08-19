@@ -5,6 +5,7 @@ import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/doctor_admin_screen.dart';
 import 'screens/super_admin_screen.dart';
+import 'screens/main_navigation_screen.dart';
 import 'services/appointment_service.dart';
 import 'services/auth_service.dart';
 
@@ -90,9 +91,65 @@ class DocBuddyApp extends StatelessWidget {
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           ),
         ),
-        home: const LoginScreen(),
+        home: const AuthWrapper(),
         debugShowCheckedModeBanner: false,
       ),
+    );
+  }
+}
+
+class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAuth();
+  }
+
+  Future<void> _initializeAuth() async {
+    final authService = context.read<AuthService>();
+    await authService.initialize();
+    setState(() {
+      _isInitialized = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_isInitialized) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(
+            color: Color(0xFF6366F1),
+          ),
+        ),
+      );
+    }
+
+    return Consumer<AuthService>(
+      builder: (context, authService, child) {
+        if (authService.isLoggedIn) {
+          // User is already logged in, show appropriate screen based on user type
+          if (authService.isSuperAdmin()) {
+            return const SuperAdminScreen();
+          } else if (authService.isDoctor()) {
+            return const DoctorAdminScreen();
+          } else {
+            return const MainNavigationScreen();
+          }
+        } else {
+          // User is not logged in, show login screen
+          return const LoginScreen();
+        }
+      },
     );
   }
 } 

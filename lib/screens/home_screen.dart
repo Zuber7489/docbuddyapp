@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/appointment_service.dart';
 import '../services/auth_service.dart';
-import 'doctors_screen.dart';
-import 'appointments_screen.dart';
 import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Function(int) onTabSwitch;
+  
+  const HomeScreen({super.key, required this.onTabSwitch});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -62,44 +62,42 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF6366F1),
-              Color(0xFF8B5CF6),
-              Color(0xFFEC4899),
-            ],
-            stops: [0.0, 0.5, 1.0],
-          ),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF6366F1),
+            Color(0xFF8B5CF6),
+            Color(0xFFEC4899),
+          ],
+          stops: [0.0, 0.5, 1.0],
         ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              _buildHeader(),
-              Expanded(
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                    child: _buildContent(),
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(),
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
                   ),
                 ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
+                  child: _buildContent(),
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -149,51 +147,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ],
             ),
           ),
-          PopupMenuButton<String>(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.account_circle,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
-            onSelected: (value) {
-              if (value == 'logout') {
-                authService.logout();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                );
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'profile',
-                child: Row(
-                  children: [
-                    const Icon(Icons.person, color: Color(0xFF6366F1)),
-                    const SizedBox(width: 8),
-                    Text('Profile: ${authService.currentUser?.name ?? 'User'}'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'logout',
-                child: Row(
-                  children: [
-                    Icon(Icons.logout, color: Color(0xFFEF4444)),
-                    SizedBox(width: 8),
-                    Text('Logout'),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          // Profile menu is now handled by MainNavigationScreen
         ],
       ),
     );
@@ -265,10 +219,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           'Search and book appointments with specialists',
           Icons.medical_services,
           const Color(0xFF6366F1),
-          () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const DoctorsScreen()),
-          ),
+          () {
+            // Switch to doctors tab
+            widget.onTabSwitch(1);
+          },
         ),
         const SizedBox(height: 16),
         _buildActionCard(
@@ -276,10 +230,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           'View and manage your appointments',
           Icons.calendar_today,
           const Color(0xFF10B981),
-          () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AppointmentsScreen()),
-          ),
+          () {
+            // Switch to appointments tab
+            widget.onTabSwitch(2);
+          },
         ),
         const SizedBox(height: 16),
         _buildActionCard(
@@ -287,10 +241,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           'Check your appointments for today',
           Icons.today,
           const Color(0xFFF59E0B),
-          () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AppointmentsScreen()),
-          ),
+          () {
+            // Switch to appointments tab
+            widget.onTabSwitch(2);
+          },
         ),
       ],
     );
@@ -469,10 +423,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ),
               GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AppointmentsScreen()),
-                ),
+                onTap: () {
+                  // Switch to appointments tab
+                  widget.onTabSwitch(2);
+                },
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
