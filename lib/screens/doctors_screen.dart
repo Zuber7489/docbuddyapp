@@ -79,19 +79,19 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(
               Icons.medical_services,
               color: Colors.white,
-              size: 28,
+              size: 24,
             ),
           ),
           const SizedBox(width: 16),
@@ -102,7 +102,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                 Text(
                   'Find Doctors',
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 24,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
                     letterSpacing: -0.5,
@@ -111,7 +111,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                 Text(
                   'Book appointments with specialists',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     color: Colors.white,
                     fontWeight: FontWeight.w500,
                   ),
@@ -119,16 +119,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
               ],
             ),
           ),
-          // Test button for debugging
-          IconButton(
-            onPressed: _testUrlLauncher,
-            icon: const Icon(
-              Icons.bug_report,
-              color: Colors.white,
-              size: 24,
-            ),
-            tooltip: 'Test URL Launcher',
-          ),
+
         ],
       ),
     );
@@ -671,33 +662,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
     );
   }
 
-  // Test function to debug URL launcher
-  Future<void> _testUrlLauncher() async {
-    try {
-      // Test 1: Simple tel URI
-      print('Testing simple tel URI...');
-      final testUri = Uri.parse('tel:+1234567890');
-      await launchUrl(testUri, mode: LaunchMode.externalApplication);
-      _showSuccessSnackBar('Test 1: Simple tel URI launched');
-    } catch (e) {
-      print('Test 1 failed: $e');
-      _showErrorSnackBar('Test 1 failed: $e');
-    }
-    
-    // Wait a bit before next test
-    await Future.delayed(const Duration(seconds: 2));
-    
-    try {
-      // Test 2: WhatsApp URI
-      print('Testing WhatsApp URI...');
-      final whatsappUri = Uri.parse('https://wa.me/1234567890?text=Test');
-      await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
-      _showSuccessSnackBar('Test 2: WhatsApp URI launched');
-    } catch (e) {
-      print('Test 2 failed: $e');
-      _showErrorSnackBar('Test 2 failed: $e');
-    }
-  }
+
 
   @override
   void dispose() {

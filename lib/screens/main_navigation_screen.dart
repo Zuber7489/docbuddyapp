@@ -133,8 +133,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
         ),
       ),
-      floatingActionButton: _currentIndex == 0 ? _buildBookAppointmentFAB() : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+
     );
   }
 
@@ -187,47 +186,5 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     );
   }
 
-  Widget _buildBookAppointmentFAB() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF6366F1),
-            Color(0xFF8B5CF6),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF6366F1).withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: FloatingActionButton(
-        onPressed: () {
-          // Show a helpful message about booking appointments
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Browse doctors in the Doctors tab to book appointments'),
-              backgroundColor: Color(0xFF6366F1),
-              behavior: SnackBarBehavior.floating,
-              duration: Duration(seconds: 3),
-            ),
-          );
-        },
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        tooltip: 'Book Appointment',
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 28,
-        ),
-      ),
-    );
-  }
+
 } 
