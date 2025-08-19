@@ -63,6 +63,17 @@ class AppointmentService extends ChangeNotifier {
         availableDays: ['Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         availableTimeSlots: ['08:00 AM', '09:00 AM', '10:00 AM', '02:00 PM', '03:00 PM'],
       ),
+      Doctor(
+        id: '5',
+        name: 'Dr. Lisa Thompson',
+        specialization: 'Neurologist',
+        imageUrl: '',
+        rating: 4.8,
+        experience: 15,
+        location: 'Neurology Center',
+        availableDays: ['Monday', 'Tuesday', 'Thursday', 'Friday'],
+        availableTimeSlots: ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM'],
+      ),
     ];
   }
 
@@ -92,7 +103,9 @@ class AppointmentService extends ChangeNotifier {
   }
 
   Future<void> bookAppointment(Appointment appointment) async {
-    _appointments.add(appointment);
+    // Create appointment with pending status for doctor approval
+    final pendingAppointment = appointment.copyWith(status: 'pending');
+    _appointments.add(pendingAppointment);
     await _saveAppointments();
     notifyListeners();
   }

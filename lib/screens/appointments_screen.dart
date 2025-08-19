@@ -379,12 +379,12 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
       ),
     );
   }
-
+          
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
           Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
@@ -404,21 +404,21 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
               ],
             ),
             child: Icon(
-              Icons.calendar_today_outlined,
+                    Icons.calendar_today_outlined,
               size: 80,
               color: const Color(0xFF6366F1),
             ),
-          ),
+                  ),
           const SizedBox(height: 32),
-          Text(
-            _getEmptyStateMessage(),
-            style: TextStyle(
+                  Text(
+                    _getEmptyStateMessage(),
+                    style: TextStyle(
               fontSize: 20,
               color: Colors.grey.shade700,
               fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.center,
-          ),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () => Navigator.pop(context),
@@ -485,22 +485,22 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
           onTap: () {
             // Navigate to appointment details
           },
-          child: Padding(
+      child: Padding(
             padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
                     _buildDoctorAvatar(appointment.doctor),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            appointment.doctor.name,
-                            style: const TextStyle(
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        appointment.doctor.name,
+                        style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: Colors.black87,
@@ -515,18 +515,18 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
                               borderRadius: const BorderRadius.all(Radius.circular(6)),
                             ),
                             child: Text(
-                              appointment.doctor.specialization,
+                        appointment.doctor.specialization,
                               style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF6366F1),
                               ),
                               overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
+                  ),
+                ),
                     const SizedBox(width: 8),
                     Flexible(
                       child: _buildStatusBadge(appointment.status),
@@ -594,7 +594,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
               ),
             ],
           ),
-          const SizedBox(height: 16),
+              const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
@@ -644,7 +644,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: [
+      children: [
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
@@ -657,12 +657,12 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
                   color: const Color(0xFF6366F1),
                 ),
               ),
-              const SizedBox(width: 8),
-              Text(
+        const SizedBox(width: 8),
+        Text(
                 label,
-                style: TextStyle(
+          style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey.shade600,
+            color: Colors.grey.shade600,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -782,9 +782,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
                 fontWeight: FontWeight.w700,
               ),
               overflow: TextOverflow.ellipsis,
-            ),
           ),
-        ],
+        ),
+      ],
       ),
     );
   }

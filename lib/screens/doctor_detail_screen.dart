@@ -91,18 +91,18 @@ class DoctorDetailScreen extends StatelessWidget {
   Widget _buildContent(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildDoctorHeader(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDoctorHeader(),
           const SizedBox(height: 32),
-          _buildDoctorInfo(),
+            _buildDoctorInfo(),
           const SizedBox(height: 32),
-          _buildAvailabilitySection(),
+            _buildAvailabilitySection(),
           const SizedBox(height: 40),
-          _buildBookButton(context),
+            _buildBookButton(context),
           const SizedBox(height: 24), // Bottom padding for scroll safety
-        ],
+          ],
       ),
     );
   }
@@ -125,20 +125,20 @@ class DoctorDetailScreen extends StatelessWidget {
           width: 1,
         ),
       ),
-      child: Column(
-        children: [
+        child: Column(
+          children: [
           _buildDoctorAvatar(),
           const SizedBox(height: 20),
-          Text(
-            doctor.name,
-            style: const TextStyle(
+            Text(
+              doctor.name,
+              style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w700,
               color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
+            const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
@@ -155,9 +155,9 @@ class DoctorDetailScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
@@ -179,9 +179,9 @@ class DoctorDetailScreen extends StatelessWidget {
                       color: Colors.white,
                       size: 16,
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      doctor.rating.toString(),
+                const SizedBox(width: 4),
+                Text(
+                  doctor.rating.toString(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -206,10 +206,10 @@ class DoctorDetailScreen extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                ),
+              ],
+            ),
+          ],
       ),
     );
   }
@@ -279,25 +279,25 @@ class DoctorDetailScreen extends StatelessWidget {
 
   Widget _buildDoctorInfo() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
         Text(
-          'Doctor Information',
-          style: TextStyle(
+              'Doctor Information',
+              style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w700,
             color: Colors.grey.shade800,
-          ),
-        ),
+              ),
+            ),
         const SizedBox(height: 20),
         _buildInfoRow(Icons.location_on, 'Location', doctor.location),
+            const SizedBox(height: 16),
+            _buildInfoRow(Icons.medical_services, 'Specialization', doctor.specialization),
         const SizedBox(height: 16),
-        _buildInfoRow(Icons.medical_services, 'Specialization', doctor.specialization),
+            _buildInfoRow(Icons.work, 'Experience', '${doctor.experience} years'),
         const SizedBox(height: 16),
-        _buildInfoRow(Icons.work, 'Experience', '${doctor.experience} years'),
-        const SizedBox(height: 16),
-        _buildInfoRow(Icons.star, 'Rating', '${doctor.rating}/5.0'),
-      ],
+            _buildInfoRow(Icons.star, 'Rating', '${doctor.rating}/5.0'),
+          ],
     );
   }
 
@@ -313,7 +313,7 @@ class DoctorDetailScreen extends StatelessWidget {
         ),
       ),
       child: Row(
-        children: [
+      children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -327,12 +327,12 @@ class DoctorDetailScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey.shade600,
@@ -340,48 +340,48 @@ class DoctorDetailScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 16,
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
                   ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
+      ],
       ),
     );
   }
 
   Widget _buildAvailabilitySection() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
         Text(
-          'Availability',
-          style: TextStyle(
+              'Availability',
+              style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w700,
             color: Colors.grey.shade800,
-          ),
-        ),
+              ),
+            ),
         const SizedBox(height: 20),
         Text(
-          'Available Days:',
-          style: TextStyle(
+              'Available Days:',
+              style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: Colors.grey.shade700,
-          ),
-        ),
+              ),
+            ),
         const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
+            Wrap(
+              spacing: 8,
           runSpacing: 8,
-          children: doctor.availableDays.map((day) {
+              children: doctor.availableDays.map((day) {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -400,23 +400,23 @@ class DoctorDetailScreen extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-            );
-          }).toList(),
-        ),
+                );
+              }).toList(),
+            ),
         const SizedBox(height: 24),
         Text(
-          'Available Time Slots:',
-          style: TextStyle(
+              'Available Time Slots:',
+              style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: Colors.grey.shade700,
-          ),
-        ),
+              ),
+            ),
         const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
+            Wrap(
+              spacing: 8,
           runSpacing: 8,
-          children: doctor.availableTimeSlots.map((time) {
+              children: doctor.availableTimeSlots.map((time) {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -435,10 +435,10 @@ class DoctorDetailScreen extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-            );
-          }).toList(),
-        ),
-      ],
+                );
+              }).toList(),
+            ),
+          ],
     );
   }
 
