@@ -170,16 +170,16 @@ class _SignupScreenState extends State<SignupScreen> {
                             labelText: 'Full Name',
                             hintText: 'Enter your full name',
                             prefixIcon: Container(
-                              margin: const EdgeInsets.all(12),
-                              padding: const EdgeInsets.all(8),
+                              margin: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF6366F1).withOpacity(0.1),
-                                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                borderRadius: const BorderRadius.all(Radius.circular(8)),
                               ),
                               child: const Icon(
                                 Icons.person,
                                 color: Color(0xFF6366F1),
-                                size: 20,
+                                size: 18,
                               ),
                             ),
                             border: OutlineInputBorder(
@@ -213,16 +213,16 @@ class _SignupScreenState extends State<SignupScreen> {
                             labelText: 'Email',
                             hintText: 'Enter your email',
                             prefixIcon: Container(
-                              margin: const EdgeInsets.all(12),
-                              padding: const EdgeInsets.all(8),
+                              margin: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF6366F1).withOpacity(0.1),
-                                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                borderRadius: const BorderRadius.all(Radius.circular(8)),
                               ),
                               child: const Icon(
                                 Icons.email,
                                 color: Color(0xFF6366F1),
-                                size: 20,
+                                size: 18,
                               ),
                             ),
                             border: OutlineInputBorder(
@@ -259,16 +259,16 @@ class _SignupScreenState extends State<SignupScreen> {
                             labelText: 'Phone Number',
                             hintText: 'Enter your phone number',
                             prefixIcon: Container(
-                              margin: const EdgeInsets.all(12),
-                              padding: const EdgeInsets.all(8),
+                              margin: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF6366F1).withOpacity(0.1),
-                                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                borderRadius: const BorderRadius.all(Radius.circular(8)),
                               ),
                               child: const Icon(
                                 Icons.phone,
                                 color: Color(0xFF6366F1),
-                                size: 20,
+                                size: 18,
                               ),
                             ),
                             border: OutlineInputBorder(
@@ -305,16 +305,16 @@ class _SignupScreenState extends State<SignupScreen> {
                             labelText: 'Password',
                             hintText: 'Enter your password',
                             prefixIcon: Container(
-                              margin: const EdgeInsets.all(12),
-                              padding: const EdgeInsets.all(8),
+                              margin: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF6366F1).withOpacity(0.1),
-                                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                borderRadius: const BorderRadius.all(Radius.circular(8)),
                               ),
                               child: const Icon(
                                 Icons.lock,
                                 color: Color(0xFF6366F1),
-                                size: 20,
+                                size: 18,
                               ),
                             ),
                             suffixIcon: IconButton(
@@ -358,16 +358,16 @@ class _SignupScreenState extends State<SignupScreen> {
                             labelText: 'Confirm Password',
                             hintText: 'Confirm your password',
                             prefixIcon: Container(
-                              margin: const EdgeInsets.all(12),
-                              padding: const EdgeInsets.all(8),
+                              margin: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF6366F1).withOpacity(0.1),
-                                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                borderRadius: const BorderRadius.all(Radius.circular(8)),
                               ),
                               child: const Icon(
                                 Icons.lock_outline,
                                 color: Color(0xFF6366F1),
-                                size: 20,
+                                size: 18,
                               ),
                             ),
                             suffixIcon: IconButton(

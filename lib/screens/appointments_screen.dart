@@ -221,11 +221,11 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
               borderRadius: const BorderRadius.all(Radius.circular(16)),
@@ -240,7 +240,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
             child: const Icon(
               Icons.calendar_today,
               color: Colors.white,
-              size: 28,
+              size: 24,
             ),
           ),
           const SizedBox(width: 16),
@@ -251,7 +251,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
                 Text(
                   'My Appointments',
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 24,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
                     letterSpacing: -0.5,
@@ -260,7 +260,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
                 Text(
                   'Manage your health schedule',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     color: Colors.white,
                     fontWeight: FontWeight.w500,
                   ),
@@ -287,7 +287,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
               }
 
               return ListView.builder(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 itemCount: filteredAppointments.length,
                 itemBuilder: (context, index) {
                   return _buildAppointmentCard(filteredAppointments[index], index);
@@ -302,7 +302,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
 
   Widget _buildTabBar() {
     return Container(
-      margin: const EdgeInsets.all(24),
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
         borderRadius: const BorderRadius.all(Radius.circular(20)),
@@ -315,7 +315,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(6),
         child: TabBar(
           controller: _tabController,
           onTap: (index) {
@@ -344,10 +344,10 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey.shade600,
           labelStyle: const TextStyle(
-            fontSize: 14,
+            fontSize: 13,
             fontWeight: FontWeight.w700,
           ),
-          labelPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          labelPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           tabs: const [
             Tab(text: 'All'),
             Tab(text: 'Upcoming'),
@@ -359,72 +359,74 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
   }
           
   Widget _buildEmptyState() {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-          Container(
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFF6366F1).withOpacity(0.1),
-                  const Color(0xFF8B5CF6).withOpacity(0.05),
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF6366F1).withOpacity(0.1),
+                    const Color(0xFF8B5CF6).withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: const BorderRadius.all(Radius.circular(30)),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF6366F1).withOpacity(0.2),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
                 ],
               ),
-                             borderRadius: const BorderRadius.all(Radius.circular(30)),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF6366F1).withOpacity(0.2),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Icon(
-                    Icons.calendar_today_outlined,
-              size: 80,
-              color: const Color(0xFF6366F1),
-            ),
-                  ),
-          const SizedBox(height: 32),
-                  Text(
-                    _getEmptyStateMessage(),
-                    style: TextStyle(
-              fontSize: 20,
-              color: Colors.grey.shade700,
-              fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () {
-              // Navigate to doctors tab to book appointment
-              // Since this is a tab, we need to use a callback or navigate to main screen
-              // For now, we'll show a message to use the doctors tab
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Use the Doctors tab to book appointments'),
-                  backgroundColor: Color(0xFF6366F1),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-            icon: const Icon(Icons.add),
-            label: const Text('Book Appointment'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6366F1),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(16)),
+              child: Icon(
+                Icons.calendar_today_outlined,
+                size: 60,
+                color: const Color(0xFF6366F1),
               ),
-              elevation: 0,
-              shadowColor: const Color(0xFF6366F1).withOpacity(0.3),
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+            Text(
+              _getEmptyStateMessage(),
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey.shade700,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {
+                // Show message to use doctors tab
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Use the Doctors tab to book appointments'),
+                    backgroundColor: Color(0xFF6366F1),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Book Appointment'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6366F1),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
+                elevation: 0,
+                shadowColor: const Color(0xFF6366F1).withOpacity(0.3),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -448,7 +450,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
 
     return AnimatedContainer(
       duration: Duration(milliseconds: 300 + (index * 100)),
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -458,24 +460,24 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
             Colors.grey.shade50,
           ],
         ),
-                  borderRadius: const BorderRadius.all(Radius.circular(24)),
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
-            blurRadius: 25,
-            offset: const Offset(0, 10),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: const BorderRadius.all(Radius.circular(24)),
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
           onTap: () {
             // Navigate to appointment details
           },
-      child: Padding(
-            padding: const EdgeInsets.all(24),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -522,10 +524,10 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 _buildInfoGrid(appointment),
                 if (canCancel) ...[
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
@@ -538,7 +540,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(16)),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                     ),
                   ),
@@ -553,7 +555,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
 
   Widget _buildInfoGrid(Appointment appointment) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
         borderRadius: const BorderRadius.all(Radius.circular(16)),
@@ -573,7 +575,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
                   DateFormat('MMM dd, yyyy').format(appointment.date),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: _buildInfoItem(
                   Icons.access_time,
@@ -583,7 +585,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
               ),
             ],
           ),
-              const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
@@ -593,7 +595,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
                   appointment.patientName,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
                 child: _buildInfoItem(
                   Icons.phone,
@@ -604,7 +606,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
             ],
           ),
           if (appointment.notes != null && appointment.notes!.isNotEmpty) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             _buildInfoItem(
               Icons.note,
               'Notes',
@@ -620,7 +622,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
   Widget _buildInfoItem(IconData icon, String label, String value, {bool fullWidth = false}) {
     return Container(
       width: fullWidth ? double.infinity : null,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.all(Radius.circular(12)),
@@ -633,23 +635,23 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-      children: [
+            children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   color: const Color(0xFF6366F1).withOpacity(0.1),
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  borderRadius: const BorderRadius.all(Radius.circular(6)),
                 ),
                 child: Icon(
                   icon,
-                  size: 16,
+                  size: 14,
                   color: const Color(0xFF6366F1),
                 ),
               ),
-        const SizedBox(width: 8),
-        Text(
+              const SizedBox(width: 6),
+              Text(
                 label,
-          style: TextStyle(
+                style: TextStyle(
                   fontSize: 12,
             color: Colors.grey.shade600,
                   fontWeight: FontWeight.w600,
