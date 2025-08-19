@@ -456,6 +456,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           ),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
@@ -482,6 +483,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           ),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {

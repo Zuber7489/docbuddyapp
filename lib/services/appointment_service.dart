@@ -17,7 +17,7 @@ class AppointmentService extends ChangeNotifier {
   }
 
   void _loadDoctors() {
-    // Mock data for doctors
+    // Mock data for doctors with phone and WhatsApp numbers
     _doctors = [
       Doctor(
         id: '1',
@@ -29,6 +29,8 @@ class AppointmentService extends ChangeNotifier {
         location: 'Downtown Medical Center',
         availableDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         availableTimeSlots: ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM'],
+        phone: '+91 98765 43210',
+        whatsapp: '+91 98765 43210',
       ),
       Doctor(
         id: '2',
@@ -40,6 +42,8 @@ class AppointmentService extends ChangeNotifier {
         location: 'City Skin Clinic',
         availableDays: ['Monday', 'Wednesday', 'Friday'],
         availableTimeSlots: ['10:00 AM', '11:00 AM', '01:00 PM', '02:00 PM'],
+        phone: '+91 98765 43211',
+        whatsapp: '+91 98765 43211',
       ),
       Doctor(
         id: '3',
@@ -51,6 +55,8 @@ class AppointmentService extends ChangeNotifier {
         location: 'Children\'s Health Center',
         availableDays: ['Monday', 'Tuesday', 'Thursday', 'Saturday'],
         availableTimeSlots: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM'],
+        phone: '+91 98765 43212',
+        whatsapp: '+91 98765 43212',
       ),
       Doctor(
         id: '4',
@@ -62,6 +68,8 @@ class AppointmentService extends ChangeNotifier {
         location: 'Sports Medicine Institute',
         availableDays: ['Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         availableTimeSlots: ['08:00 AM', '09:00 AM', '10:00 AM', '02:00 PM', '03:00 PM'],
+        phone: '+91 98765 43213',
+        whatsapp: '+91 98765 43213',
       ),
       Doctor(
         id: '5',
@@ -73,6 +81,8 @@ class AppointmentService extends ChangeNotifier {
         location: 'Neurology Center',
         availableDays: ['Monday', 'Tuesday', 'Thursday', 'Friday'],
         availableTimeSlots: ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM'],
+        phone: '+91 98765 43214',
+        whatsapp: '+91 98765 43214',
       ),
     ];
   }

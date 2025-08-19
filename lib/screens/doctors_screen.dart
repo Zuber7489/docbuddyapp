@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../services/appointment_service.dart';
 import '../models/doctor.dart';
 import 'doctor_detail_screen.dart';
@@ -19,7 +20,10 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _filteredDoctors = context.read<AppointmentService>().doctors;
+      final appointmentService = context.read<AppointmentService>();
+      setState(() {
+        _filteredDoctors = appointmentService.doctors;
+      });
     });
   }
 
@@ -256,14 +260,20 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
           borderRadius: BorderRadius.circular(20),
           child: Padding(
             padding: const EdgeInsets.all(20),
-            child: Row(
+            child: Column(
               children: [
-                _buildDoctorAvatar(doctor),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildDoctorInfo(doctor),
+                Row(
+                  children: [
+                    _buildDoctorAvatar(doctor),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildDoctorInfo(doctor),
+                    ),
+                    _buildRatingBadge(doctor),
+                  ],
                 ),
-                _buildRatingBadge(doctor),
+                const SizedBox(height: 16),
+                _buildActionButtons(doctor),
               ],
             ),
           ),
@@ -447,6 +457,107 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(Doctor doctor) {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: () => _makePhoneCall(doctor.phone),
+            icon: const Icon(Icons.phone, size: 18),
+            label: const Text('Call'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF10B981),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: () => _openWhatsApp(doctor.whatsapp, doctor.name),
+            icon: const Icon(Icons.chat, size: 18),
+            label: const Text('WhatsApp'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF25D366),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DoctorDetailScreen(doctor: doctor),
+                ),
+              );
+            },
+            icon: const Icon(Icons.calendar_today, size: 18),
+            label: const Text('Book'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6366F1),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+    try {
+      if (await canLaunchUrl(phoneUri)) {
+        await launchUrl(phoneUri);
+      } else {
+        _showErrorSnackBar('Could not launch phone dialer');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error making phone call: $e');
+    }
+  }
+
+  Future<void> _openWhatsApp(String phoneNumber, String doctorName) async {
+    // Remove any spaces and special characters from phone number
+    final cleanPhone = phoneNumber.replaceAll(RegExp(r'[^0-9+]'), '');
+    final message = "Hello Dr. $doctorName, I would like to book an appointment with you.";
+    final whatsappUrl = "https://wa.me/$cleanPhone?text=${Uri.encodeComponent(message)}";
+    
+    try {
+      if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
+        await launchUrl(Uri.parse(whatsappUrl), mode: LaunchMode.externalApplication);
+      } else {
+        _showErrorSnackBar('WhatsApp is not installed on this device');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error opening WhatsApp: $e');
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }

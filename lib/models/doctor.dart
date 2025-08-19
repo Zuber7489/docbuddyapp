@@ -8,6 +8,8 @@ class Doctor {
   final String location;
   final List<String> availableDays;
   final List<String> availableTimeSlots;
+  final String phone;
+  final String whatsapp;
 
   Doctor({
     required this.id,
@@ -19,6 +21,8 @@ class Doctor {
     required this.location,
     required this.availableDays,
     required this.availableTimeSlots,
+    required this.phone,
+    required this.whatsapp,
   });
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
@@ -32,6 +36,8 @@ class Doctor {
       location: json['location'],
       availableDays: List<String>.from(json['availableDays']),
       availableTimeSlots: List<String>.from(json['availableTimeSlots']),
+      phone: json['phone'] ?? '',
+      whatsapp: json['whatsapp'] ?? '',
     );
   }
 
@@ -46,6 +52,8 @@ class Doctor {
       'location': location,
       'availableDays': availableDays,
       'availableTimeSlots': availableTimeSlots,
+      'phone': phone,
+      'whatsapp': whatsapp,
     };
   }
 } 
