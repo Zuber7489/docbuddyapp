@@ -11,7 +11,8 @@
     <application
         android:label="docbuddy"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:requestLegacyExternalStorage="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -59,6 +60,10 @@
             <action android:name="android.intent.action.DIAL" />
             <data android:scheme="tel" />
         </intent>
+        <intent>
+            <action android:name="android.intent.action.CALL" />
+            <data android:scheme="tel" />
+        </intent>
         <!-- WhatsApp requirement -->
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -67,6 +72,19 @@
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="whatsapp" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" android:host="api.whatsapp.com" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" android:host="web.whatsapp.com" />
+        </intent>
+        <!-- Browser requirement for fallback -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
         </intent>
     </queries>
 </manifest>

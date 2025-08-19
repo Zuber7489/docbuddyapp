@@ -119,6 +119,16 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
               ],
             ),
           ),
+          // Test button for debugging
+          IconButton(
+            onPressed: _testUrlLauncher,
+            icon: const Icon(
+              Icons.bug_report,
+              color: Colors.white,
+              size: 24,
+            ),
+            tooltip: 'Test URL Launcher',
+          ),
         ],
       ),
     );
@@ -536,48 +546,51 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
       // Clean the phone number - remove spaces, dashes, and other characters
       final cleanPhone = phoneNumber.replaceAll(RegExp(r'[^0-9+]'), '');
       
-      // Debug: Show the cleaned phone number
       print('Original phone: $phoneNumber, Cleaned: $cleanPhone');
       
-      // Try multiple phone URI formats
-      final phoneUris = [
+      // Try to launch directly without checking canLaunchUrl first
+      try {
+        final phoneUri = Uri.parse('tel:$cleanPhone');
+        print('Trying to launch phone URI: $phoneUri');
+        
+        await launchUrl(
+          phoneUri, 
+          mode: LaunchMode.externalApplication,
+        );
+        _showSuccessSnackBar('Opening phone dialer...');
+        return;
+      } catch (e) {
+        print('Direct launch failed: $e');
+      }
+      
+      // Fallback: try alternative URI formats
+      final fallbackUris = [
         Uri(scheme: 'tel', path: cleanPhone),
-        Uri.parse('tel:$cleanPhone'),
         Uri.parse('tel://$cleanPhone'),
       ];
       
-      bool launched = false;
-      
-      for (final uri in phoneUris) {
+      for (final uri in fallbackUris) {
         try {
-          print('Trying URI: $uri');
-          if (await canLaunchUrl(uri)) {
-            print('Can launch: $uri');
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-            launched = true;
-            _showSuccessSnackBar('Opening phone dialer...');
-            break;
-          } else {
-            print('Cannot launch: $uri');
-          }
+          print('Trying fallback URI: $uri');
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+          _showSuccessSnackBar('Opening phone dialer...');
+          return;
         } catch (e) {
-          print('Error with URI $uri: $e');
-          // Continue to next URI format
+          print('Fallback URI failed: $e');
           continue;
         }
       }
       
-      if (!launched) {
-        // Try to open dialer without pre-filled number
-        final dialerUri = Uri(scheme: 'tel');
-        print('Trying fallback dialer: $dialerUri');
-        if (await canLaunchUrl(dialerUri)) {
-          await launchUrl(dialerUri, mode: LaunchMode.externalApplication);
-          _showSuccessSnackBar('Opening phone dialer...');
-        } else {
-          _showErrorSnackBar('Phone dialer not available on this device');
-        }
+      // Last resort: try to open empty dialer
+      try {
+        final emptyDialerUri = Uri(scheme: 'tel');
+        await launchUrl(emptyDialerUri, mode: LaunchMode.externalApplication);
+        _showSuccessSnackBar('Opening phone dialer...');
+      } catch (e) {
+        print('Empty dialer failed: $e');
+        _showErrorSnackBar('Phone dialer not available on this device');
       }
+      
     } catch (e) {
       print('Phone call error: $e');
       _showErrorSnackBar('Error making phone call: $e');
@@ -592,53 +605,44 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
       // Remove + if it's the first character for WhatsApp
       final whatsappPhone = cleanPhone.startsWith('+') ? cleanPhone.substring(1) : cleanPhone;
       
-      // Debug: Show the cleaned phone number
       print('Original WhatsApp phone: $phoneNumber, Cleaned: $cleanPhone, WhatsApp: $whatsappPhone');
       
       final message = "Hello Dr. $doctorName, I would like to book an appointment with you.";
       
-      // Try multiple WhatsApp URL formats
+      // Try to launch WhatsApp directly without checking canLaunchUrl first
       final whatsappUrls = [
         "https://wa.me/$whatsappPhone?text=${Uri.encodeComponent(message)}",
         "whatsapp://send?phone=$whatsappPhone&text=${Uri.encodeComponent(message)}",
         "https://api.whatsapp.com/send?phone=$whatsappPhone&text=${Uri.encodeComponent(message)}",
       ];
       
-      bool launched = false;
-      
       for (final url in whatsappUrls) {
         try {
           final uri = Uri.parse(url);
           print('Trying WhatsApp URL: $url');
-          if (await canLaunchUrl(uri)) {
-            print('Can launch WhatsApp: $url');
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-            launched = true;
-            _showSuccessSnackBar('Opening WhatsApp...');
-            break;
-          } else {
-            print('Cannot launch WhatsApp: $url');
-          }
+          
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+          _showSuccessSnackBar('Opening WhatsApp...');
+          return;
         } catch (e) {
-          print('Error with WhatsApp URL $url: $e');
-          // Continue to next URL format
+          print('WhatsApp URL failed: $url - $e');
           continue;
         }
       }
       
-      if (!launched) {
-        // If WhatsApp is not available, try to open in browser
+      // If WhatsApp app fails, try WhatsApp Web
+      try {
         final webUrl = "https://web.whatsapp.com/send?phone=$whatsappPhone&text=${Uri.encodeComponent(message)}";
         final webUri = Uri.parse(webUrl);
         
         print('Trying WhatsApp Web: $webUrl');
-        if (await canLaunchUrl(webUri)) {
-          await launchUrl(webUri, mode: LaunchMode.externalApplication);
-          _showSuccessSnackBar('Opening WhatsApp Web...');
-        } else {
-          _showErrorSnackBar('WhatsApp is not available on this device');
-        }
+        await launchUrl(webUri, mode: LaunchMode.externalApplication);
+        _showSuccessSnackBar('Opening WhatsApp Web...');
+      } catch (e) {
+        print('WhatsApp Web failed: $e');
+        _showErrorSnackBar('WhatsApp is not available on this device');
       }
+      
     } catch (e) {
       print('WhatsApp error: $e');
       _showErrorSnackBar('Error opening WhatsApp: $e');
@@ -665,6 +669,34 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         duration: const Duration(seconds: 2),
       ),
     );
+  }
+
+  // Test function to debug URL launcher
+  Future<void> _testUrlLauncher() async {
+    try {
+      // Test 1: Simple tel URI
+      print('Testing simple tel URI...');
+      final testUri = Uri.parse('tel:+1234567890');
+      await launchUrl(testUri, mode: LaunchMode.externalApplication);
+      _showSuccessSnackBar('Test 1: Simple tel URI launched');
+    } catch (e) {
+      print('Test 1 failed: $e');
+      _showErrorSnackBar('Test 1 failed: $e');
+    }
+    
+    // Wait a bit before next test
+    await Future.delayed(const Duration(seconds: 2));
+    
+    try {
+      // Test 2: WhatsApp URI
+      print('Testing WhatsApp URI...');
+      final whatsappUri = Uri.parse('https://wa.me/1234567890?text=Test');
+      await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+      _showSuccessSnackBar('Test 2: WhatsApp URI launched');
+    } catch (e) {
+      print('Test 2 failed: $e');
+      _showErrorSnackBar('Test 2 failed: $e');
+    }
   }
 
   @override
