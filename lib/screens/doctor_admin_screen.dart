@@ -18,33 +18,77 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _selectedFilter = 'pending';
+  
+  // Cache filtered appointments to avoid recalculation
+  Map<String, List<Appointment>> _filteredAppointmentsCache = {};
+  List<Appointment> _currentAppointments = [];
+  String? _currentDoctorId;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(_handleTabChange);
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_handleTabChange);
     _tabController.dispose();
     super.dispose();
   }
 
+  void _handleTabChange() {
+    if (_tabController.indexIsChanging) {
+      final newFilter = _getFilterForIndex(_tabController.index);
+      if (newFilter != _selectedFilter) {
+        setState(() {
+          _selectedFilter = newFilter;
+        });
+      }
+    }
+  }
+
+  String _getFilterForIndex(int index) {
+    switch (index) {
+      case 0: return 'pending';
+      case 1: return 'confirmed';
+      case 2: return 'completed';
+      default: return 'pending';
+    }
+  }
+
   List<Appointment> _getFilteredAppointments(List<Appointment> appointments, String doctorId) {
+    // Check cache first
+    if (_filteredAppointmentsCache.containsKey(_selectedFilter) && 
+        _currentAppointments == appointments && _currentDoctorId == doctorId) {
+      return _filteredAppointmentsCache[_selectedFilter]!;
+    }
+
+    // Update cache
+    _currentAppointments = appointments;
+    _currentDoctorId = doctorId;
+    
     final doctorAppointments = appointments.where((app) => app.doctor.id == doctorId).toList();
+    List<Appointment> filtered;
     
     switch (_selectedFilter) {
       case 'pending':
-        return doctorAppointments.where((app) => app.status == 'pending').toList();
+        filtered = doctorAppointments.where((app) => app.status == 'pending').toList();
+        break;
       case 'confirmed':
-        return doctorAppointments.where((app) => app.status == 'confirmed').toList();
+        filtered = doctorAppointments.where((app) => app.status == 'confirmed').toList();
+        break;
       case 'completed':
-        return doctorAppointments.where((app) => 
+        filtered = doctorAppointments.where((app) => 
           app.status == 'completed' || app.date.isBefore(DateTime.now())).toList();
+        break;
       default:
-        return doctorAppointments;
+        filtered = doctorAppointments;
     }
+    
+    _filteredAppointmentsCache[_selectedFilter] = filtered;
+    return filtered;
   }
 
   Future<void> _updateAppointmentStatus(Appointment appointment, String status) async {
@@ -229,52 +273,45 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
 
   Widget _buildTabBar() {
     return Container(
-      margin: const EdgeInsets.all(24),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(4),
         child: TabBar(
           controller: _tabController,
           onTap: (index) {
-            setState(() {
-              switch (index) {
-                case 0:
-                  _selectedFilter = 'pending';
-                  break;
-                case 1:
-                  _selectedFilter = 'confirmed';
-                  break;
-                case 2:
-                  _selectedFilter = 'completed';
-                  break;
-              }
-            });
+            // Tab change is handled by listener, no need for setState here
           },
-          indicator: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-            ),
-            borderRadius: BorderRadius.all(Radius.circular(16)),
+          indicator: BoxDecoration(
+            color: const Color(0xFF6366F1),
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF6366F1).withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          indicatorPadding: const EdgeInsets.all(4),
+          indicatorPadding: const EdgeInsets.all(2),
           indicatorSize: TabBarIndicatorSize.tab,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey.shade600,
           labelStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
           ),
-          labelPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          labelPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           tabs: const [
             Tab(text: 'Pending'),
             Tab(text: 'Confirmed'),
@@ -357,7 +394,7 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
 
   Widget _buildAppointmentCard(Appointment appointment) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -367,17 +404,17 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
             Colors.grey.shade50,
           ],
         ),
-        borderRadius: const BorderRadius.all(Radius.circular(24)),
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 25,
-            offset: const Offset(0, 10),
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 15,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -385,23 +422,23 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
             Row(
               children: [
                 Container(
-                  width: 50,
-                  height: 50,
+                  width: 45,
+                  height: 45,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
                     ),
-                    borderRadius: const BorderRadius.all(Radius.circular(16)),
+                    borderRadius: const BorderRadius.all(Radius.circular(14)),
                   ),
                   child: const Center(
                     child: Icon(
                       Icons.person,
                       color: Colors.white,
-                      size: 24,
+                      size: 22,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,7 +446,7 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
                       Text(
                         appointment.patientName,
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 17,
                           fontWeight: FontWeight.w700,
                           color: Colors.black87,
                         ),
@@ -417,7 +454,7 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
                       Text(
                         appointment.patientPhone,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13,
                           color: Colors.grey.shade600,
                         ),
                       ),
@@ -428,14 +465,14 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
               ],
             ),
             
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             
             // Appointment Details
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.grey.shade50,
-                borderRadius: const BorderRadius.all(Radius.circular(16)),
+                borderRadius: const BorderRadius.all(Radius.circular(14)),
                 border: Border.all(
                   color: Colors.grey.shade200,
                   width: 1,
@@ -452,7 +489,7 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
                           DateFormat('MMM dd, yyyy').format(appointment.date),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: _buildInfoItem(
                           Icons.access_time,
@@ -463,7 +500,7 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
                     ],
                   ),
                   if (appointment.notes != null && appointment.notes!.isNotEmpty) ...[
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     _buildInfoItem(
                       Icons.note,
                       'Notes',
@@ -477,7 +514,7 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
             
             // Action Buttons
             if (appointment.status == 'pending') ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
@@ -489,13 +526,13 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
                         foregroundColor: const Color(0xFFEF4444),
                         side: const BorderSide(color: Color(0xFFEF4444), width: 2),
                         shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(16)),
+                          borderRadius: BorderRadius.all(Radius.circular(14)),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () => _updateAppointmentStatus(appointment, 'confirmed'),
@@ -505,9 +542,9 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
                         backgroundColor: const Color(0xFF10B981),
                         foregroundColor: Colors.white,
                         shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(16)),
+                          borderRadius: BorderRadius.all(Radius.circular(14)),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                     ),
                   ),
@@ -517,7 +554,7 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
             
             if (appointment.status == 'confirmed' && 
                 appointment.date.isAfter(DateTime.now())) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -528,9 +565,9 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
                     backgroundColor: const Color(0xFF6366F1),
                     foregroundColor: Colors.white,
                     shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                      borderRadius: BorderRadius.all(Radius.circular(14)),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                 ),
               ),
@@ -544,10 +581,10 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
   Widget _buildInfoItem(IconData icon, String label, String value, {bool fullWidth = false}) {
     return Container(
       width: fullWidth ? double.infinity : null,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.all(Radius.circular(12)),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
         border: Border.all(
           color: Colors.grey.shade200,
           width: 1,
@@ -559,33 +596,33 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   color: const Color(0xFF6366F1).withOpacity(0.1),
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  borderRadius: const BorderRadius.all(Radius.circular(6)),
                 ),
                 child: Icon(
                   icon,
-                  size: 16,
+                  size: 14,
                   color: const Color(0xFF6366F1),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   color: Colors.grey.shade600,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
@@ -629,22 +666,22 @@ class _DoctorAdminScreenState extends State<DoctorAdminScreen>
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
-        borderRadius: const BorderRadius.all(Radius.circular(16)),
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
         border: Border.all(color: color, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 16),
-          const SizedBox(width: 4),
+          Icon(icon, color: color, size: 14),
+          const SizedBox(width: 3),
           Text(
             text,
             style: TextStyle(
               color: color,
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: FontWeight.w700,
             ),
           ),

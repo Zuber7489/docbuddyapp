@@ -16,38 +16,80 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _selectedFilter = 'all';
+  
+  // Cache filtered appointments to avoid recalculation
+  Map<String, List<Appointment>> _filteredAppointmentsCache = {};
+  List<Appointment> _currentAppointments = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(_handleTabChange);
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_handleTabChange);
     _tabController.dispose();
     super.dispose();
   }
 
+  void _handleTabChange() {
+    if (_tabController.indexIsChanging) {
+      final newFilter = _getFilterForIndex(_tabController.index);
+      if (newFilter != _selectedFilter) {
+        setState(() {
+          _selectedFilter = newFilter;
+        });
+      }
+    }
+  }
+
+  String _getFilterForIndex(int index) {
+    switch (index) {
+      case 0: return 'all';
+      case 1: return 'upcoming';
+      case 2: return 'past';
+      default: return 'all';
+    }
+  }
+
   List<Appointment> _getFilteredAppointments(List<Appointment> appointments) {
+    // Check cache first
+    if (_filteredAppointmentsCache.containsKey(_selectedFilter) && 
+        _currentAppointments == appointments) {
+      return _filteredAppointmentsCache[_selectedFilter]!;
+    }
+
+    // Update cache
+    _currentAppointments = appointments;
+    List<Appointment> filtered;
+    
     switch (_selectedFilter) {
       case 'upcoming':
-        return appointments
+        filtered = appointments
             .where((appointment) =>
                 appointment.date.isAfter(DateTime.now()) &&
                 appointment.status == 'confirmed')
             .toList();
+        break;
       case 'past':
-        return appointments
+        filtered = appointments
             .where((appointment) => appointment.date.isBefore(DateTime.now()))
             .toList();
+        break;
       case 'cancelled':
-        return appointments
+        filtered = appointments
             .where((appointment) => appointment.status == 'cancelled')
             .toList();
+        break;
       default:
-        return appointments;
+        filtered = appointments;
     }
+    
+    _filteredAppointmentsCache[_selectedFilter] = filtered;
+    return filtered;
   }
 
   Color _getStatusColor(String status) {
@@ -302,52 +344,45 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
 
   Widget _buildTabBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(6),
+        padding: const EdgeInsets.all(4),
         child: TabBar(
           controller: _tabController,
           onTap: (index) {
-            setState(() {
-              switch (index) {
-                case 0:
-                  _selectedFilter = 'all';
-                  break;
-                case 1:
-                  _selectedFilter = 'upcoming';
-                  break;
-                case 2:
-                  _selectedFilter = 'past';
-                  break;
-              }
-            });
+            // Tab change is handled by listener, no need for setState here
           },
-          indicator: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-            ),
-            borderRadius: BorderRadius.all(Radius.circular(16)),
+          indicator: BoxDecoration(
+            color: const Color(0xFF6366F1),
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF6366F1).withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          indicatorPadding: const EdgeInsets.all(4),
+          indicatorPadding: const EdgeInsets.all(2),
           indicatorSize: TabBarIndicatorSize.tab,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey.shade600,
           labelStyle: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
           ),
-          labelPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          labelPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           tabs: const [
             Tab(text: 'All'),
             Tab(text: 'Upcoming'),
@@ -448,8 +483,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
     final isPast = appointment.date.isBefore(DateTime.now());
     final canCancel = !isPast && appointment.status == 'confirmed';
 
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 300 + (index * 100)),
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -478,20 +512,20 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
           },
           child: Padding(
             padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  children: [
                     _buildDoctorAvatar(appointment.doctor),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        appointment.doctor.name,
-                        style: const TextStyle(
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            appointment.doctor.name,
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: Colors.black87,
@@ -506,18 +540,18 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
                               borderRadius: const BorderRadius.all(Radius.circular(6)),
                             ),
                             child: Text(
-                        appointment.doctor.specialization,
+                              appointment.doctor.specialization,
                               style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF6366F1),
                               ),
                               overflow: TextOverflow.ellipsis,
-                        ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
+                    ),
                     const SizedBox(width: 8),
                     Flexible(
                       child: _buildStatusBadge(appointment.status),
@@ -622,10 +656,10 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
   Widget _buildInfoItem(IconData icon, String label, String value, {bool fullWidth = false}) {
     return Container(
       width: fullWidth ? double.infinity : null,
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.all(Radius.circular(12)),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
         border: Border.all(
           color: Colors.grey.shade200,
           width: 1,
@@ -637,33 +671,33 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
                   color: const Color(0xFF6366F1).withOpacity(0.1),
-                  borderRadius: const BorderRadius.all(Radius.circular(6)),
+                  borderRadius: const BorderRadius.all(Radius.circular(5)),
                 ),
                 child: Icon(
                   icon,
-                  size: 14,
+                  size: 12,
                   color: const Color(0xFF6366F1),
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 5),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 12,
-            color: Colors.grey.shade600,
+                  fontSize: 11,
+                  color: Colors.grey.shade600,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
@@ -676,8 +710,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
 
   Widget _buildDoctorAvatar(Doctor doctor) {
     return Container(
-      width: 60,
-      height: 60,
+      width: 50,
+      height: 50,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
@@ -687,17 +721,17 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
             Color(0xFF8B5CF6),
           ],
         ),
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6366F1).withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: const Color(0xFF6366F1).withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
         child: doctor.imageUrl.isNotEmpty
             ? Image.network(
                 doctor.imageUrl,
@@ -722,13 +756,13 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
             Color(0xFF8B5CF6),
           ],
         ),
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
       ),
       child: Center(
         child: Text(
           doctor.name.split(' ').map((e) => e[0]).join(''),
           style: const TextStyle(
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: Colors.white,
           ),
